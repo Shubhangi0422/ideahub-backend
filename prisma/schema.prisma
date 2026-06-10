@@ -1,0 +1,83 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
+}
+
+model User {
+  id        String   @id @default(uuid())
+  name      String
+  email     String   @unique
+  password  String
+  createdAt DateTime @default(now())
+
+  ideas    Idea[]
+  comments Comment[]
+  likes      Like[]
+  savedIdeas SavedIdea[]
+}
+
+model Idea {
+  id          String   @id @default(uuid())
+  title       String
+  description String
+  category    String
+  tags        String[]
+  references  String?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  userId String
+  user   User   @relation(fields: [userId], references: [id])
+
+  comments Comment[]
+  likes      Like[]
+  savedIdeas SavedIdea[]
+}
+
+model Comment {
+  id      String @id @default(uuid())
+  content String
+
+  userId String
+  ideaId String
+
+  createdAt DateTime @default(now())
+
+  user User @relation(fields: [userId], references: [id])
+  idea Idea @relation(fields: [ideaId], references: [id])
+}
+
+
+model Like {
+  id        String   @id @default(uuid())
+
+  userId    String
+  ideaId    String
+
+  createdAt DateTime @default(now())
+
+  user User @relation(fields: [userId], references: [id])
+  idea Idea @relation(fields: [ideaId], references: [id])
+
+  @@unique([userId, ideaId])
+}
+
+model SavedIdea {
+  id        String   @id @default(uuid())
+
+  userId    String
+  ideaId    String
+
+  createdAt DateTime @default(now())
+
+  user User @relation(fields: [userId], references: [id])
+  idea Idea @relation(fields: [ideaId], references: [id])
+
+  @@unique([userId, ideaId])
+}
