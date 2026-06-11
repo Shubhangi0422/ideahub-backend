@@ -7,6 +7,7 @@ const commentRoutes = require("./routes/comments.routes");
 const likeRoutes = require("./routes/likes.routes");
 const savedRoutes = require("./routes/saved.routes");
 const userRoutes = require("./routes/users.routes");
+const notificationRoutes = require("./routes/notifications.routes");
 
 const app = express();
 
@@ -19,4 +20,5 @@ app.use("/api/comments", commentRoutes);
 app.use("/api/likes", likeRoutes);
 app.use("/api/saved", savedRoutes);
 app.use("/api/users", userRoutes);
+app.use("/api/notifications", notificationRoutes);
 module.exports = app;

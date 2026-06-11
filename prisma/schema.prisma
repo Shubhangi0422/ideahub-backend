@@ -19,6 +19,9 @@ model User {
   comments Comment[]
   likes      Like[]
   savedIdeas SavedIdea[]
+
+  notifications         Notification[] @relation("recipient")
+  triggeredNotifications Notification[] @relation("actor")
 }
 
 model Idea {
@@ -38,6 +41,8 @@ model Idea {
   comments Comment[]
   likes      Like[]
   savedIdeas SavedIdea[]
+
+  notifications Notification[]
 }
 
 model Comment {
@@ -51,6 +56,8 @@ model Comment {
 
   user User @relation(fields: [userId], references: [id])
   idea Idea @relation(fields: [ideaId], references: [id])
+
+  notifications Notification[]
 }
 
 
@@ -80,4 +87,20 @@ model SavedIdea {
   idea Idea @relation(fields: [ideaId], references: [id])
 
   @@unique([userId, ideaId])
+}
+
+model Notification {
+  id        String   @id @default(uuid())
+  type      String   // "LIKE" | "COMMENT"
+  userId    String   // Recipient (owner of the idea)
+  actorId   String   // Person who liked/commented
+  ideaId    String   // The idea it pertains to
+  commentId String?  // Optional commentId reference
+  isRead    Boolean  @default(false)
+  createdAt DateTime @default(now())
+
+  user    User     @relation("recipient", fields: [userId], references: [id], onDelete: Cascade)
+  actor   User     @relation("actor", fields: [actorId], references: [id], onDelete: Cascade)
+  idea    Idea     @relation(fields: [ideaId], references: [id], onDelete: Cascade)
+  comment Comment? @relation(fields: [commentId], references: [id], onDelete: Cascade)
 }

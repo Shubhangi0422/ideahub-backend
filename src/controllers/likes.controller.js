@@ -37,6 +37,17 @@ const likeIdea = async (req, res) => {
       },
     });
 
+    if (req.user.id !== idea.userId) {
+      await prisma.notification.create({
+        data: {
+          type: "LIKE",
+          userId: idea.userId,
+          actorId: req.user.id,
+          ideaId,
+        },
+      });
+    }
+
     res.status(201).json({
       success: true,
       message: "Idea liked successfully",
@@ -73,6 +84,15 @@ const unlikeIdea = async (req, res) => {
     await prisma.like.delete({
       where: {
         id: existingLike.id,
+      },
+    });
+
+    // Delete corresponding notification
+    await prisma.notification.deleteMany({
+      where: {
+        type: "LIKE",
+        actorId: req.user.id,
+        ideaId,
       },
     });
 

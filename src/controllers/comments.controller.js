@@ -41,6 +41,18 @@ const createComment = async (req, res) => {
       },
     });
 
+    if (req.user.id !== idea.userId) {
+      await prisma.notification.create({
+        data: {
+          type: "COMMENT",
+          userId: idea.userId,
+          actorId: req.user.id,
+          ideaId,
+          commentId: comment.id,
+        },
+      });
+    }
+
     res.status(201).json({
       success: true,
       message: "Comment added successfully",
